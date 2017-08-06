@@ -6,9 +6,11 @@
 package baysiannetwork;
 
 import com.sun.javafx.css.SizeUnits;
+import com.sun.xml.internal.ws.util.StringUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import sun.java2d.BackBufferCapsProvider;
 
@@ -20,7 +22,7 @@ public class BaysianNetwork {
     
     int n ;
     double [] fp = {0.9999,0.9998,0.9997,0.9996};
-    
+    double[] failprobability ;
     ArrayList<Cutset> minCutset = new ArrayList<>();
     
     
@@ -83,18 +85,13 @@ public class BaysianNetwork {
                       }
                       system[i] = !isfailed(temp);
                       if(system[i])
-                          fw.append("0" + NEW_LINE_SEPARATOR);
-                      else
                           fw.append("1" + NEW_LINE_SEPARATOR);
+                      else
+                          fw.append("0" + NEW_LINE_SEPARATOR);
                   }
                
                
-//                fw.append("Name" + COMMA_DELIMITER + "SignalProbability" + COMMA_DELIMITER + "EPP" +NEW_LINE_SEPARATOR);
-//                 for (Gate g : gate) {
-//                    fw.append(g.getName().replaceAll(",", "-") + COMMA_DELIMITER);
-//                    fw.append(g.getSignalProbability()+ COMMA_DELIMITER);
-//                    fw.append(g.getEpp()+NEW_LINE_SEPARATOR);
-//                }
+
                 
     	        fw.close();
 
@@ -124,65 +121,62 @@ public class BaysianNetwork {
     
     
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Please Enter n :");
-        int n =0;
-        try {
-           n = sc.nextInt();
-        } catch (Exception e) {
-            System.out.println("Enter a int !!!!!!");
-            System.exit(0);
-        }
-//        System.out.println("e : Entering CutSet is ended");
-//        System.out.println("n : Enter a new CutSet");
-        boolean flag = true ;
+        File input ;
+        int n = 0 ;
         ArrayList<Cutset> inputCutset = new ArrayList<>();
-//        while(flag){
-//            boolean flag2 = true;
-//            ArrayList<Integer> set = new ArrayList<>();
-//            while(flag2){
-//                String s = sc.nextLine();
-//                if(s=="n"){
-//                      flag2 = false ;
-//                      inputCutset.add(new Cutset(n, set));
-//                      break ;
-//                }
-//                  
-//                else if(s=="e"){
-//                    flag = false ;
-//                    flag2 = false ;
-//                    if(!set.isEmpty())
-//                        inputCutset.add(new Cutset(n, set));
-//                   break ;
-//                }
-//                else{
-//                    try {
-//                      int  t = Integer.parseInt(s);
-////                        System.out.println(Integer.toBinaryString(t));
-//                      if(set.contains(t))
-//                          System.out.println(t + " is contained in set ! ");
-//                      else if (t >n)
-//                            System.out.println(" this component isnt exist");
-//                      
-//                      else
-//                          set.add(t);
-//                    } catch (Exception e) {
-//                        System.out.println("Enter a int !!!!!");
-//                    }
-//
-//                     
-//                }
-//               
-//            }
+        try {
+           input = new File("input.txt");
+           Scanner scanner = new Scanner(input);
+           String line = scanner.nextLine() ;
+           n = Integer.parseInt(line);
+           System.out.println("number of component : " + n);
+           line = scanner.nextLine();
+           System.out.println(line);
+           double[] workProbability = new double[n];
+           
+           
+           for(int i = 0 ; i < n; i ++){
+               if(line.contains(",")){
+                    workProbability[i] = Double.parseDouble(line.substring(0, line.indexOf(',')));
+                    line = line.substring(line.indexOf(',')+1);
+               }
+               else
+                    workProbability[i] = Double.parseDouble(line.substring(1));
+               System.out.println("work probability of component " + (i+1) + " : " + workProbability[i]);
+           }
+           while(scanner.hasNextLine()){
+               line = scanner.nextLine();
+//               int[] cutset = Arrays.stream(line.split(",")).mapToInt(Integer::parseInt).toArray(); 
+               String[] cutsetStr = line.split(",");
+               int index = 0 ;
+               int[] cutset = new int[cutsetStr.length];
+               for(int i = 0 ; i < cutset.length ; i++){
+                   try {
+                   cutset[index] = Integer.parseInt(cutsetStr[i]);
+                   index ++ ;
+                   } catch (NumberFormatException e) {
+                       System.out.println(e);
+                   }
+               }
+                  
+                  cutset = Arrays.copyOf(cutset, index);
+//                   
+//               }
+               if(cutset.length>0){
+                    inputCutset.add(new Cutset(n, cutset));
+                    System.out.println("cutset " + line + " added ");
+                    for (int i = 0; i < cutset.length; i++) 
+                        System.out.print(cutset[i] + " , ");
+                   System.out.println("------------------");
+               }
+                   
+           }
+                
+        } catch (Exception e) {
+            System.out.println("something in input file has a problem :| ");
+        }
 
-    int[] cutset1 = { 4} ;
-    int[] cutset2 = {3};
-    int[] cutset3 = {1,2};
-    inputCutset.add(new Cutset(n, cutset1));
-    inputCutset.add(new Cutset(n, cutset2));
-    inputCutset.add(new Cutset(n, cutset3));
-    
-            
+
             new BaysianNetwork(n, inputCutset);
             
             

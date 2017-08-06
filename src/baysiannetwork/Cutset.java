@@ -20,10 +20,12 @@ public class Cutset {
 //        this.n = n ;
 }
 
-    Cutset(int n, int[] cutset) {
+    public Cutset(int n, int[] cutset) {
         for (int i = 0; i < cutset.length; i++)
-            set.add(cutset[i]);
-        
+            if(cutset[i]< n)
+              set.add(cutset[i]);
+        else
+                System.out.println("there is a problem in inpu cutset");
     }
  
     public boolean isInCutset(boolean[] input){
